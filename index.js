@@ -50,7 +50,7 @@ async function run() {
             const email = req.query.email;
             let query = {};
             if (req.query?.email) {
-                query = { email: email }
+                query = { email: email };
             }
             const result = await toyCollection.find(query).toArray();
             res.send(result);
@@ -74,6 +74,25 @@ async function run() {
         app.post('/addtoy', async (req, res) => {
 
             const result = await toyCollection.insertOne(req.body);
+            res.send(result);
+        });
+        app.patch('/toyUpdate/:id', async (req, res) => {
+            const id = req.params.id;
+            const body = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    ...body
+                },
+            };
+            const result = await toyCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        });
+
+        app.delete('/toyDelete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await toyCollection.deleteOne(query);
             res.send(result);
         });
 
