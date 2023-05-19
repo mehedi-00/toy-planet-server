@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -33,11 +33,17 @@ async function run() {
         await client.db("admin").command({ ping: 1 });
 
         const toyCollection = client.db('toy_db').collection('toys');
-        
+
 
         app.get('/alltoy', async (req, res) => {
             const result = await toyCollection.find().toArray();
             res.send(result);
+        });
+        app.get('/toy/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await toyCollection.findOne(query);
+            res.send(result)
         });
         app.get('/toy/:name', async (req, res) => {
             const toyName = req.params.name;
@@ -50,7 +56,7 @@ async function run() {
                     ],
                 })
                 .limit(20).toArray();
-        
+
             res.send(result);
         });
 
