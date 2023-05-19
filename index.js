@@ -43,8 +43,19 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await toyCollection.findOne(query);
-            res.send(result)
+            res.send(result);
         });
+
+        app.get('/toys', async (req, res) => {
+            const email = req.query.email;
+            let query = {};
+            if (req.query?.email) {
+                query = { email: email }
+            }
+            const result = await toyCollection.find(query).toArray();
+            res.send(result);
+        });
+
         app.get('/toy/:name', async (req, res) => {
             const toyName = req.params.name;
 
