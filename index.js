@@ -31,11 +31,29 @@ async function run() {
         await client.connect();
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
+
         const toyCollection = client.db('toy_db').collection('toys');
+        
+
         app.get('/alltoy', async (req, res) => {
             const result = await toyCollection.find().toArray();
             res.send(result);
         });
+        app.get('/toy/:name', async (req, res) => {
+            const toyName = req.params.name;
+
+            const result = await toyCollection
+                .find({
+                    $or: [
+                        { toy_name: { $regex: toyName, $options: "i" } }
+
+                    ],
+                })
+                .limit(20).toArray();
+        
+            res.send(result);
+        });
+
         app.post('/addtoy', async (req, res) => {
 
             const result = await toyCollection.insertOne(req.body);
