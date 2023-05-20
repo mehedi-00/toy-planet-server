@@ -36,13 +36,13 @@ async function run() {
 
 
         app.get('/alltoy', async (req, res) => {
-            const result = await toyCollection.find().toArray();
+            const result = await toyCollection.find().limit(20).toArray();
             res.send(result);
         });
         app.get('/toy/:subCategory', async (req, res) => {
             const subCategory = req.params.subCategory;
             const result = await toyCollection.find({ subcategory: subCategory }).toArray();
-            res.send(result)
+            res.send(result);
         });
         app.get('/toy/:id', async (req, res) => {
             const id = req.params.id;
@@ -54,11 +54,15 @@ async function run() {
 
         app.get('/toys', async (req, res) => {
             const email = req.query.email;
+            const order = req.query.order;
             let query = {};
             if (req.query?.email) {
                 query = { email: email };
             }
-            const result = await toyCollection.find(query).toArray();
+
+            const sortOrder = req.query.order === 'highest' ? -1 : 1;
+            const result = await toyCollection.find(query).sort({ price: sortOrder }).toArray();
+
             res.send(result);
         });
 
@@ -78,8 +82,9 @@ async function run() {
         });
 
         app.post('/addtoy', async (req, res) => {
-
-            const result = await toyCollection.insertOne(req.body);
+            const body = req.body;
+            body.price = parseFloat(body.price)
+            const result = await toyCollection.insertOne(body);
             res.send(result);
         });
         app.patch('/toyUpdate/:id', async (req, res) => {
