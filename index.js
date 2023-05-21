@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const port = process.env.PORT || 5000;
 const app = express();
+const port = process.env.PORT || 5000;
 
 // midlleware 
 
@@ -32,19 +32,20 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
+        
 
         const toyCollection = client.db('toy_db').collection('toys');
         const blogCollection = client.db('toy_db').collection('blogs');
 
-        app.get('/blogs',async(req,res)=>{
-            const result = await blogCollection.find().toArray();
-            res.send(result);
-        })
         app.get('/alltoy', async (req, res) => {
             const result = await toyCollection.find().limit(20).toArray();
             res.send(result);
         });
+        app.get('/blogs',async(req,res)=>{
+            const result = await blogCollection.find().toArray();
+            res.send(result);
+        })
+        
         app.get('/toy/:subCategory', async (req, res) => {
             const subCategory = req.params.subCategory;
             const result = await toyCollection.find({ subcategory: subCategory }).toArray();
@@ -119,7 +120,7 @@ async function run() {
             const result = await toyCollection.deleteOne(query);
             res.send(result);
         });
-
+        await client.db("admin").command({ ping: 1 });
         // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
