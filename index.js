@@ -35,8 +35,12 @@ async function run() {
         await client.db("admin").command({ ping: 1 });
 
         const toyCollection = client.db('toy_db').collection('toys');
+        const blogCollection = client.db('toy_db').collection('blogs');
 
-
+        app.get('/blogs',async(req,res)=>{
+            const result = await blogCollection.find().toArray();
+            res.send(result);
+        })
         app.get('/alltoy', async (req, res) => {
             const result = await toyCollection.find().limit(20).toArray();
             res.send(result);
@@ -55,8 +59,8 @@ async function run() {
         });
 
         app.get('/top-rated-toy', async (req, res) => {
-           
-            const result = await toyCollection.find().sort({ratting: -1}).limit(6).toArray();
+
+            const result = await toyCollection.find().sort({ ratting: -1 }).limit(6).toArray();
             res.send(result);
         });
 
