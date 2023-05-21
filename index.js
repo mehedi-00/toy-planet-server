@@ -11,7 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 
-
+app.get('/', (req, res) => {
+    res.send('server is Runnning');
+});
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.k8bloyi.mongodb.net/?retryWrites=true&w=majority`;
@@ -44,10 +46,17 @@ async function run() {
             const result = await toyCollection.find({ subcategory: subCategory }).toArray();
             res.send(result);
         });
-        app.get('/toy/:id', async (req, res) => {
+        app.get('/singletoy/:id', async (req, res) => {
             const id = req.params.id;
+
             const query = { _id: new ObjectId(id) };
             const result = await toyCollection.findOne(query);
+            res.send(result);
+        });
+
+        app.get('/top-rated-toy', async (req, res) => {
+           
+            const result = await toyCollection.find().sort({ratting: -1}).limit(6).toArray();
             res.send(result);
         });
 
@@ -66,7 +75,7 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/toy/:name', async (req, res) => {
+        app.get('/toysearch/:name', async (req, res) => {
             const toyName = req.params.name;
 
             const result = await toyCollection
@@ -83,7 +92,7 @@ async function run() {
 
         app.post('/addtoy', async (req, res) => {
             const body = req.body;
-            body.price = parseFloat(body.price)
+            body.price = parseFloat(body.price);
             const result = await toyCollection.insertOne(body);
             res.send(result);
         });
@@ -114,15 +123,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
-
-
-app.get('/', (req, res) => {
-    res.send('server is Runnning');
-});
-
 
 
 app.listen(port, () => {
